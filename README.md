@@ -20,7 +20,7 @@ A lightweight ASP.NET Core Web API for managing insurance claims with CRUD opera
 
 ## 🏃 Quick Start
 
-### 1. Restore Dependencies
+### 1. Restore Dependencies.
 
 ```bash
 dotnet restore
