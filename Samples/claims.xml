@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Claims>
+    <Claim>
+        <PolicyNumber>POL-2024-004</PolicyNumber>
+        <ClaimantName>Emily Davis</ClaimantName>
+        <ClaimAmount>3500.00</ClaimAmount>
+        <DateOfLoss>2024-11-08</DateOfLoss>
+        <Status>Pending</Status>
+        <Remarks>Fire damage to property</Remarks>
+    </Claim>
+    <Claim>
+        <PolicyNumber>POL-2024-005</PolicyNumber>
+        <ClaimantName>Robert Wilson</ClaimantName>
+        <ClaimAmount>1800.75</ClaimAmount>
+        <DateOfLoss>2024-11-10</DateOfLoss>
+        <Status>Pending</Status>
+        <Remarks>Theft claim - electronics stolen</Remarks>
+    </Claim>
+    <Claim>
+        <PolicyNumber>POL-2024-006</PolicyNumber>
+        <ClaimantName>Lisa Anderson</ClaimantName>
+        <ClaimAmount>4200.00</ClaimAmount>
+        <DateOfLoss>2024-11-09</DateOfLoss>
+        <Status>Under Review</Status>
+        <Remarks>Storm damage to roof</Remarks>
+    </Claim>
+</Claims>
+
