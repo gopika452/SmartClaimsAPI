@@ -10,6 +10,11 @@ namespace ClaimsPortal.Services
         Task<Claim?> UpdateClaimAsync(int id, Claim claim);
         Task<bool> DeleteClaimAsync(int id);
         Task<int> ImportClaimsFromXmlAsync(Stream xmlStream);
+
+        // 🔹 ADD THESE TWO METHODS 👇
+        Task<IEnumerable<Claim>> GetClaimsByStatusAsync(string status);
+        Task<Dictionary<string, int>> GetClaimAnalyticsAsync();
     }
 }
+
 
