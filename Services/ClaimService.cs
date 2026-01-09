@@ -19,7 +19,9 @@ namespace ClaimsPortal.Services
         public async Task<IEnumerable<Claim>> GetAllClaimsAsync()
         {
             _logger.LogInformation("Retrieving all claims");
-            return await _context.Claims.OrderByDescending(c => c.CreatedAt).ToListAsync();
+            return await _context.Claims
+                .OrderByDescending(c => c.CreatedAt)
+                .ToListAsync();
         }
 
         public async Task<Claim?> GetClaimByIdAsync(int id)
@@ -31,7 +33,7 @@ namespace ClaimsPortal.Services
         public async Task<Claim> CreateClaimAsync(Claim claim)
         {
             _logger.LogInformation("Creating new claim for policy: {PolicyNumber}", claim.PolicyNumber);
-            
+
             claim.CreatedAt = DateTime.UtcNow;
             if (string.IsNullOrWhiteSpace(claim.Status))
             {
@@ -40,7 +42,7 @@ namespace ClaimsPortal.Services
 
             _context.Claims.Add(claim);
             await _context.SaveChangesAsync();
-            
+
             _logger.LogInformation("Claim created with ID: {ClaimId}", claim.ClaimId);
             return claim;
         }
@@ -48,7 +50,7 @@ namespace ClaimsPortal.Services
         public async Task<Claim?> UpdateClaimAsync(int id, Claim claim)
         {
             _logger.LogInformation("Updating claim with ID: {ClaimId}", id);
-            
+
             var existingClaim = await _context.Claims.FindAsync(id);
             if (existingClaim == null)
             {
@@ -64,7 +66,7 @@ namespace ClaimsPortal.Services
             existingClaim.Remarks = claim.Remarks;
 
             await _context.SaveChangesAsync();
-            
+
             _logger.LogInformation("Claim with ID {ClaimId} updated successfully", id);
             return existingClaim;
         }
@@ -72,7 +74,7 @@ namespace ClaimsPortal.Services
         public async Task<bool> DeleteClaimAsync(int id)
         {
             _logger.LogInformation("Deleting claim with ID: {ClaimId}", id);
-            
+
             var claim = await _context.Claims.FindAsync(id);
             if (claim == null)
             {
@@ -82,7 +84,7 @@ namespace ClaimsPortal.Services
 
             _context.Claims.Remove(claim);
             await _context.SaveChangesAsync();
-            
+
             _logger.LogInformation("Claim with ID {ClaimId} deleted successfully", id);
             return true;
         }
@@ -90,7 +92,7 @@ namespace ClaimsPortal.Services
         public async Task<int> ImportClaimsFromXmlAsync(Stream xmlStream)
         {
             _logger.LogInformation("Starting XML import");
-            
+
             try
             {
                 var document = await XDocument.LoadAsync(xmlStream, LoadOptions.None, CancellationToken.None);
@@ -107,7 +109,7 @@ namespace ClaimsPortal.Services
                     var status = element.Element("Status")?.Value ?? "Pending";
                     var remarks = element.Element("Remarks")?.Value;
 
-                    if (string.IsNullOrWhiteSpace(policyNumber) || 
+                    if (string.IsNullOrWhiteSpace(policyNumber) ||
                         string.IsNullOrWhiteSpace(claimantName) ||
                         string.IsNullOrWhiteSpace(claimAmountStr) ||
                         string.IsNullOrWhiteSpace(dateOfLossStr))
@@ -128,7 +130,7 @@ namespace ClaimsPortal.Services
                         continue;
                     }
 
-                    var claim = new Claim
+                    claims.Add(new Claim
                     {
                         PolicyNumber = policyNumber,
                         ClaimantName = claimantName,
@@ -137,9 +139,7 @@ namespace ClaimsPortal.Services
                         Status = status,
                         Remarks = remarks,
                         CreatedAt = DateTime.UtcNow
-                    };
-
-                    claims.Add(claim);
+                    });
                 }
 
                 if (claims.Any())
@@ -156,6 +156,32 @@ namespace ClaimsPortal.Services
                 _logger.LogError(ex, "Error importing claims from XML");
                 throw;
             }
+        }
+
+        // 🔹 NEW METHOD 1: FILTER CLAIMS BY STATUS (FOR GRAPHS)
+        public async Task<IEnumerable<Claim>> GetClaimsByStatusAsync(string status)
+        {
+            _logger.LogInformation("Retrieving claims with status: {Status}", status);
+
+            return await _context.Claims
+                .Where(c => c.Status == status)
+                .OrderByDescending(c => c.CreatedAt)
+                .ToListAsync();
+        }
+
+        // 🔹 NEW METHOD 2: CLAIM ANALYTICS (FOR BAR / LINE CHART)
+        public async Task<Dictionary<string, int>> GetClaimAnalyticsAsync()
+        {
+            _logger.LogInformation("Generating claim analytics");
+
+            return await _context.Claims
+                .GroupBy(c => c.Status)
+                .Select(g => new
+                {
+                    Status = g.Key,
+                    Count = g.Count()
+                })
+                .ToDictionaryAsync(x => x.Status, x => x.Count);
         }
     }
 }
