@@ -225,6 +225,8 @@ dotnet watch run
 # Publish for deployment
 dotnet publish -c Release -o ./publish
 ```
+## Latest Update
+Added claim analytics and logging for dashboard charts - 09-Jan-2026
 
 ## ✅ Submission Checklist
 
